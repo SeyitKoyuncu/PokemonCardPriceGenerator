@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import pytesseract
 
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+
 drawing = False
 ix, iy = -1, -1
 start_point = None
@@ -20,15 +22,13 @@ def draw_rectangle(event, x, y, flags, param):
         ix = x
         iy = y
         start_point = (x, y)
-        print(f"Cordinates of selected square in down: ({x}, {y})")
+
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
         # Append recrangle coordinates to the stack
         rectangles.append((ix, iy, x, y))
-        cv2.rectangle(img, (ix, iy), (x, y), -1)
-        end_point = (x, y)
-        print(f"Cordinates of selected square in up: ({x}, {y})")
 
+        end_point = (x, y)
         width = abs(end_point[0] - start_point[0])
         height = abs(end_point[1] - start_point[1])
 
@@ -38,11 +38,8 @@ def draw_rectangle(event, x, y, flags, param):
             "width": width,
             "height": height,
         }
-
         squares.append(square_info)
-        print(f"Width: {width}, Height: {height}")
 
-    copy_image = img
 
 
 # Redraw rectangles in every frame TODO Will be added rectangle count limitation or changing the this method otherwise with much retangle program will be crash or slower
@@ -54,7 +51,7 @@ def redraw_rectangle(img, rectangles):
 
 
 # Create a imaged
-img = cv2.imread("pikachu1.jpg")
+img = cv2.imread("./Photos/pikachu1.jpg")
 
 # Create a window and bind the function to windowd
 cv2.namedWindow("Pokemon Window")
@@ -75,28 +72,27 @@ while True:
     elif key == ord("d"):  # Press 'd' to delete the last drawn rectangle
         if rectangles:
             rectangles.pop()
+        if squares:
+            squares.pop()
+
+    elif key == ord("a"):
+        for i, square in enumerate(squares):
+            print(f"Square {i + 1}: {square}")
+
+        for square in squares:
+            x, y, width, height = square["x"], square["y"], square["width"], square["height"]
+
+            # cropped image
+            square_img = img[y : y + height, x : x + width]
+            cv2.imshow("Square Window", square_img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+            text = pytesseract.image_to_string(square_img)
+            texts.append(text)
+
+        for i, text in enumerate(texts):
+            print(f"Square {i + 1} Text: {text}")
 
 cv2.destroyAllWindows()
 
-for i, square in enumerate(squares):
-    print(f"Square {i + 1}: {square}")
-
-
-for square in squares:
-    x, y, width, height = square["x"], square["y"], square["width"], square["height"]
-
-    # cropped image
-    square_img = img[y : y + height, x : x + width]
-    cv2.imshow("Square Window", square_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    pytesseract.pytesseract.tesseract_cmd = (
-        "C:\\Users\\nadid\\AppData\\Local\\Programs\\Tesseract-OCR\\tesseract.exe"
-    )
-    text = pytesseract.image_to_string(square_img)
-
-    texts.append(text)
-
-for i, text in enumerate(texts):
-    print(f"Square {i + 1} Text: {text}")
