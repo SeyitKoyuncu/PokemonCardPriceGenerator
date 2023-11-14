@@ -19,7 +19,7 @@ texts = []
 
 
 # define mouse callback function to draw circle
-def draw_rectangle(event, x, y, flags, param):
+def DrawRectangle(event, x, y, flags, param):
     global ix, iy, drawing, img, start_point, end_point
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
@@ -47,21 +47,27 @@ def draw_rectangle(event, x, y, flags, param):
 
 
 # Redraw rectangles in every frame TODO Will be added rectangle count limitation or changing the this method otherwise with much retangle program will be crash or slower
-def redraw_rectangle(img, rectangles):
+def RedrawRectangle(img, rectangles):
     temp_image = img.copy()
     for rect in rectangles:
         cv2.rectangle(temp_image, (rect[0], rect[1]), (rect[2], rect[3]), -1)
     return temp_image
 
+def ScrappingFromWeb():
+    pass
 
-# Create a imaged
-img = cv2.imread("./Photos/pikachu1.jpg")
+
+try:
+    # Create a image size
+    img = cv2.resize(cv2.imread("./Photos/pokemon1.jpg"), (720,900))
+except Exception as e:
+    print(f"Image cant loaded to app, Exception: {e}")
 
 # Create a window and bind the function to windowd
 cv2.namedWindow("Pokemon Window")
 
 # Connect the mouse button to our callback function
-cv2.setMouseCallback("Pokemon Window", draw_rectangle)
+cv2.setMouseCallback("Pokemon Window", DrawRectangle)
 
 # If text extracted, have to pop extracted texts from the set
 is_text_extracted = False
@@ -69,7 +75,7 @@ is_text_extracted = False
 # display the window
 while True:
     if rectangles:
-        temp_image = redraw_rectangle(img=img, rectangles=rectangles)
+        temp_image = RedrawRectangle(img=img, rectangles=rectangles)
         cv2.imshow("Pokemon Window", temp_image)
     else:
         cv2.imshow("Pokemon Window", img)
