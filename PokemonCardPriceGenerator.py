@@ -1,9 +1,13 @@
 # import required libraries
 import cv2
 import numpy as np
+import os
 import pytesseract
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+
+# Set TESSDATA_PREFIX environment variable, if not tesseract give an error
+os.environ['TESSDATA_PREFIX'] = r'C:\Program Files (x86)\Tesseract-OCR'
 
 drawing = False
 ix, iy = -1, -1
@@ -59,6 +63,9 @@ cv2.namedWindow("Pokemon Window")
 # Connect the mouse button to our callback function
 cv2.setMouseCallback("Pokemon Window", draw_rectangle)
 
+# If text extracted, have to pop extracted texts from the set
+is_text_extracted = False
+
 # display the window
 while True:
     if rectangles:
@@ -74,22 +81,18 @@ while True:
             rectangles.pop()
         if squares:
             squares.pop()
+        if is_text_extracted:
+            texts.pop()
 
     elif key == ord("a"):
-        for i, square in enumerate(squares):
-            print(f"Square {i + 1}: {square}")
-
         for square in squares:
             x, y, width, height = square["x"], square["y"], square["width"], square["height"]
 
             # cropped image
             square_img = img[y : y + height, x : x + width]
-            cv2.imshow("Square Window", square_img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-
             text = pytesseract.image_to_string(square_img)
             texts.append(text)
+            is_text_extracted = True
 
         for i, text in enumerate(texts):
             print(f"Square {i + 1} Text: {text}")
