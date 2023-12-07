@@ -59,7 +59,7 @@ def ScrappingFromWeb():
 
 try:
     # Create a image size
-    img = cv2.resize(cv2.imread("./Photos/pokemon1.jpg"), (720,900))
+    img = cv2.resize(cv2.imread("./Photos/weedle.jpg"), (720,900))
 except Exception as e:
     print(f"Image cant loaded to app, Exception: {e}")
 
